@@ -1,1 +1,1 @@
-{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"C:/Users/Tom/Documents/GitHub/mediamade","disabled":false,"__vagrantfile":true}}}
+{"virtualbox":{"/var/www/mediamade":{"guestpath":"/var/www/mediamade","hostpath":"C:/Users/Tom/Documents/GitHub/mediamade","disabled":false,"__vagrantfile":true}}}
