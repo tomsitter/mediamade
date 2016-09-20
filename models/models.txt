@@ -1,0 +1,18 @@
+Models
+
+Workflow
+1) Client proposes a Job
+2) A Job contains a Product
+3) A Job is linked to a Contract (to make a Production?)
+4) A Producer accepts a Contract to deliver a Product
+
+
+This gives us 5 models:
+1) Client
+2) Producer
+3) Job
+4) Product
+5) Contract
+
+and possible a meta-model:
+6) Production (contains 1 Job and 1 Contract)
