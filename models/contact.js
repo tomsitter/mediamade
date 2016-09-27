@@ -3,7 +3,8 @@ var mongoose = require('mongoose');
 var ContactSchema = new mongoose.Schema({  
   primarycontactnumber: {
     type: String, 
-    index: {unique: true}}, 
+    index: {unique: true}
+  }, 
   firstname: String, 
   lastname: String, 
   title: String, 

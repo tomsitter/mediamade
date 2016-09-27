@@ -1,69 +1,70 @@
 var express = require('express');
+var http = require('http');
 var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+// var favicon = require('serve-favicon');
+var logger = require('morgan');
+// var methodOverride = require('method-override');
+var errorHandler = require('errorhandler');
+var mongoose = require('mongoose');
+// var cookieParser = require('cookie-parser');
 var url = require('url');
-// var http = require('http');
 
-var contacts = require('./modules/contacts');
+var contacts = require('./controllers/contacts');
+var Contact = require('./models/contact');
 
-// var routes = require('./routes/index');
-// var users = require('./routes/users');
+var config = require('./config.js');
 
 var router = express.Router();
 
 var app = express();
 
+
 // view engine setup 
+app.set('port', process.env.PORT || 8000);
 app.set('views', path.join(__dirname, 'views')); 
 app.set('view engine', 'jade'); 
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+// app.use(methodOverride());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(logger('dev'));
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(cookieParser());
+// app.use(express.static(path.join(__dirname, 'public')));
 
 // app.use('/', routes);
 // app.use('/users', users);
 
-app.get('/contacts',
-        function(request, response) {
-          var get_params = url.parse(request.url, true).query;
+if ('development' == app.get('env')) {
+  app.use(errorHandler());
+}
 
-          if (Object.keys(get_params).length === 0) 
-          {
-            response.setHeader('content-type', 'application/json');
-            response.end(JSON.stringify(contacts.list()));
-          } else 
-          {
-            response.setHeader('content-type', 'application/json');
-            response.end(JSON.stringify(
-              contacts.query_by_arg(get_params.arg, get_params.value)
-            ));
-          }
+mongoose.connect(config.db.text);
+
+app.get('/contacts/:primarycontactnumber', function(request, response) {
+  console.log(request.url + ': querying for ' + request.params.primarycontactnumber);
+  contacts.findByNumber(Contact, request.params.primarycontactnumber, response);
 });
 
-
-app.get('/contacts/:number', function(request, response) {
-  response.setHeader('content-type', 'application/json');
-  response.end(JSON.stringify
-    (contacts.query(request.params.number)));
+app.post('/contacts', function(request, response) {
+  contacts.update(Contact, request.body, response);
 });
 
-app.get('/groups', function(request, response) {
-  response.setHeader('content-type', 'application/json');
-  response.end(JSON.stringify(contacts.list_groups()));
+app.put('/contacts', function(request, response) {
+  contacts.create(Contact, request.body, response);
 });
 
-app.get('/groups/:name', function(request, response) {
-  response.setHeader('content-type', 'application/json');
-  resonse.end(JSON.stringify(contacts.get_members(request.params.name)));
+app.delete('/contacts/:primarycontactnumber', function(request, response) {
+  contacts.remove(Contact, request.params.primarycontactnumber, response);
 });
+
+app.get('/contacts', function(request, response) {
+  console.log('Listing all contacts with ' + request.params.key + '=' + request.params.value);
+  contacts.list(Contact, response);
+});
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -71,20 +72,6 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
 
 // production error handler
 // no stacktraces leaked to user
@@ -95,7 +82,6 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 
 app.listen(8000, function() {

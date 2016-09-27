@@ -3,25 +3,24 @@ var should = require('should');
 var prepare = require('./prepare.js');
 var Contact = require('../models/contact.js')
 
-mongoose.connect('mongodb://localhost/contacts-test');
-
 describe('Contact: models', function() {
+
+    var contactModel = {
+        "firstname": "John",
+        "lastname": "Doe",
+        "title": "Mr.",
+        "company": "Dev Inc.",
+        "jobtitle": "Developer",
+        "primarycontactnumber": "+359777223345",
+        "primaryemailaddress": "john.doe@xyz.com",
+        "groups": ["Dev"],
+        "emailaddresses": ["j.doe@xyz.com"],
+        "othercontactnumbers": ["+359777223346", "+359777223347"]
+    };
 
     describe('#create()', function() {
         it('Should create a new Contact', function (done) {
-            var contactModel = {
-                "firstname": "John",
-                "lastname": "Doe",
-                "title": "Mr.",
-                "company": "Dev Inc.",
-                "jobtitle": "Developer",
-                "primarycontactnumber": "+359777223345",
-                "primaryemailaddress": "john.doe@xyz.com",
-                "groups": ["Dev"],
-                "emailaddresses": ["j.doe@xyz.com"],
-                "othercontactnumbers": ["+359777223346", "+359777223347"]
-            };
-
+            
             Contact.create(contactModel, function(err, createdModel) {
                 should.not.exist(err);
 

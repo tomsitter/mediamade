@@ -17,5 +17,8 @@
     "mongoose": "~4.6.0",
     "mocha": "~3.0.2",
     "should": "~11.1.0"
+  },
+  "devDependencies": {
+    "errorhandler": "^1.4.3"
   }
 }

@@ -13,6 +13,7 @@ This gives us 5 models:
 3) Job
 4) Product
 5) Contract
+7) User Activity
 
 and possible a meta-model:
 6) Production (contains 1 Job and 1 Contract)

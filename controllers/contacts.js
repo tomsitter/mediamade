@@ -1,13 +1,174 @@
-var Contact = require('../models/contact.js');
+// API for the contact model from the book "RESTful APIs with Node.js second edition"
 
-exports.create = function(req, res) {
-    new Contact({
 
-    }).save();
+exports.remove = function(model, _primarycontactnumber, response) {
+    console.log('Deleting contact with primary number: ' + _primarycontactnumber);
+    model.findOne(
+        {primarycontactnumber: _primarycontactnumber},
+        function(err, data) {
+        }
+    );
+}
+
+exports.update = function(model, requestBody, response) {
+    var primarynumber = requestBody.primarycontactnumber;
+    model.findOne({primarycontactnumber: primarynumber}, function(err, data) {
+        if (err) {
+            console.log(err);
+            if (response != null) {
+                response.writeHead(500, {'Content-Type': 'text/plain'})
+                response.end('Internal server error');
+            }
+            return;
+        } else {
+            var contact = toContact(requestBody, model);
+            if (!data) {
+                console.log('Contact with primary number: ' + primarynumber + ' does not exist. Creating contact');
+                
+                contact.save(function(error) {
+                    if (!error) {
+                        contact.save();
+                    }
+                });
+
+                if (response != null) {
+                    response.writeHead(201, {'Content-Type': 'text/plain'});
+                    response.end('Created');
+                }
+                return;
+            }
+
+            data.firstname = contact.firstname;
+            data.lastname = contact.lastname;
+            data.title = contact.title;
+            data.company = contact.company;
+            data.jobtitle = contact.jobtitle;
+            data.primarycontactnumber = contact.primarycontactnumber;
+            data.othercontactnumbers = contact.othercontactnumbers;
+            data.primaryemailaddress = contact.primaryemailaddress;
+            data.groups = contact.groups;
+
+            data.save(function(error) {
+                if (!error) {
+                    console.log('Successfully updated contact with primary number: ' + primarynumber);
+                    data.save()
+                } else {
+                    console.log('error on save');
+                }
+            });
+            if (response != null) {
+                response.send('Updated');
+            }
+        }
+    });
+};
+
+
+
+exports.create = function(model, requestBody, response) {
+    var contact = toContact(requestBody, model);
+    var primarynumber = requestBody.primarycontactnumber;
+    contact.save(function(err) {
+        if (!err) {
+            contact.save();
+        } else {
+            console.log('Checking if contact saving failed due to existing primary number: ' + primarynumber);
+            model.findOne({primarycontactnumber: primarynumber}, function(err, data) {
+                if (err) {
+                    console.log(err);
+                    if (response != null) {
+                        response.writeHead(500, {'Content-Type': 'text/plain'});
+                        response.end('Internal server error');
+                    }
+                    return;
+                } else {
+                    var contact = toContact(requestBody, model)
+                    if (!data) {
+                        console.log('This contact does not exist. It will be created');
+                        contact.save(function(err) {
+                            if (!err) {
+                                contact.save();
+                            } else {
+                                console.log(err);
+                            }
+                        });
+
+                        if (response != null) {
+                            response.writeHead(201, {'Content-Type': 'text/plain'});
+                            response.end('Created');
+                        }
+                        return;
+                    } else {
+                        console.log('Updating contact with primary contact number: ' + primarynumber);
+                        data.firstname = contact.firstname;
+                        data.lastname = contact.lastname;
+                        data.title = contact.title;
+                        data.company = contact.company;
+                        data.jobtitle = contact.jobtitle;
+                        data.primarycontactnumber = contact.primarycontactnumber;
+                        data.othercontactnumbers = contact.othercontactnumbers;
+                        data.emailaddresses = contact.emailaddresses;
+                        data.primaryemailaddress = contact.primaryemailaddress;
+                        data.groups = contact.groups;
+
+                        data.save(function (err) {
+                            if (!err) {
+                                data.save();
+                                response.end('Updated');
+                                console.log('Successfully updated contact with primary number: ' + primarynumber);
+                            } else {
+                                console.log('Error saving contact with primary number: ' + primarynumber);
+                                console.log(err);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    });
+};
+
+exports.findByNumber = function(model, _primarycontactnumber, response) {
+    model.findOne({primarycontactnumber: _primarycontactnumber}, function(err, result) {
+        if (err) {
+            console.error(err);
+            response.writeHead(500, {'COntact-Type': 'text/plain'});
+            response.end('Internal Server Error');
+            return;
+        } else {
+            if (!result) {
+                if (response != null) {
+                    response.writeHead(404, {'Content-Type': 'text/plain'});
+                    response.end('Not Found');
+                }
+                return;
+            }
+
+            if (response != null) {
+                response.setHeader('Content-Type', 'application/json');
+                response.send(result);
+            }
+            console.log(result);
+        }
+    });
+};
+
+exports.list = function(model, response) {
+    model.find({}, function(err, result) {
+        if (err) {
+            console.error(err);
+            return null
+        };
+        if (response != null) {
+            response.setHeader('Content-Type', 'application/json');
+            response.end(JSON.stringify(result));
+        }
+        return JSON.stringify(result);
+    });
 }
 
 
-function toContact(nody, Contact) {
+function toContact(body, Contact) {
     return new Contact(
     {
         firstname: body.firstname,
