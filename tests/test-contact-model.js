@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var should = require('should');
+var should = require('chai').should();
 var prepare = require('./prepare.js');
 var Contact = require('../models/contact.js')
 
