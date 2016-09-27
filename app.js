@@ -10,7 +10,7 @@ var mongoose = require('mongoose');
 // var cookieParser = require('cookie-parser');
 var url = require('url');
 
-var contacts = require('./controllers/contacts');
+var contacts_v1 = require('./controllers/contacts_v1');
 var Contact = require('./models/contact');
 
 var config = require('./config.js');
@@ -43,26 +43,31 @@ if ('development' == app.get('env')) {
 
 mongoose.connect(config.db.text);
 
-app.get('/contacts/:primarycontactnumber', function(request, response) {
+app.get('/v1/contacts/:primarycontactnumber', function(request, response) {
   console.log(request.url + ': querying for ' + request.params.primarycontactnumber);
-  contacts.findByNumber(Contact, request.params.primarycontactnumber, response);
+  contacts_v1.findByNumber(Contact, request.params.primarycontactnumber, response);
 });
 
-app.post('/contacts', function(request, response) {
-  contacts.update(Contact, request.body, response);
+app.post('/v1/contacts', function(request, response) {
+  contacts_v1.update(Contact, request.body, response);
 });
 
-app.put('/contacts', function(request, response) {
-  contacts.create(Contact, request.body, response);
+app.put('/v1/contacts', function(request, response) {
+  contacts_v1.create(Contact, request.body, response);
 });
 
-app.delete('/contacts/:primarycontactnumber', function(request, response) {
-  contacts.remove(Contact, request.params.primarycontactnumber, response);
+app.delete('/v1/contacts/:primarycontactnumber', function(request, response) {
+  contacts_v1.remove(Contact, request.params.primarycontactnumber, response);
 });
 
 app.get('/contacts', function(request, response) {
+  response.writeHead(301, {'Location': '/v1/contacts/'});
+  response.end('Version 1 is moved to /contacts/: ');
+});
+
+app.get('/v1/contacts', function(request, response) {
   console.log('Listing all contacts with ' + request.params.key + '=' + request.params.value);
-  contacts.list(Contact, response);
+  contacts_v1.list(Contact, response);
 });
 
 
