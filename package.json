@@ -11,7 +11,7 @@
   },
   "author": {
     "name": "Tom Sitter",
-    "email": "thomas.sitter@gmail.com",
+    "email": "thomas.sitter@gmail.com"
   },
   "dependencies": {
     "body-parser": "~1.15.1",
