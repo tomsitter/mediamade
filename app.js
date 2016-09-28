@@ -11,12 +11,13 @@ var mongoose = require('mongoose');
 var url = require('url');
 
 var contacts_v1 = require('./controllers/contacts_v1');
+var contacts_v2 = require('./controllers/contacts_v2');
+
 var Contact = require('./models/contact');
 
 var config = require('./config.js');
 
 var router = express.Router();
-
 var app = express();
 
 
@@ -61,8 +62,12 @@ app.delete('/v1/contacts/:primarycontactnumber', function(request, response) {
 });
 
 app.get('/contacts', function(request, response) {
-  response.writeHead(301, {'Location': '/v1/contacts/'});
-  response.end('Version 1 is moved to /contacts/: ');
+  var args = url.parse(request.url, true).query;
+  if (Object.keys(args).length == 0) {
+    contacts_v2.list(Contact, response);
+  } else {
+    JSON.stringify(contacts_v2.query_by_args(Contact, args, response));
+  }
 });
 
 app.get('/v1/contacts', function(request, response) {
