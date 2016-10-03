@@ -87,5 +87,7 @@ Vagrant.configure("2") do |config|
     # Install npm packages
     cd /var/www/mediamade
     npm install
+
+    echo "cd /var/www/mediamade" >> /home/vagrant/.bashrc
   SHELL
 end
