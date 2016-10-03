@@ -7,6 +7,13 @@ var logger = require('morgan');
 // var methodOverride = require('method-override');
 var errorHandler = require('errorhandler');
 var mongoose = require('mongoose');
+var config = require('./config.js');
+
+var Grid = require('gridfs-stream');
+mongoose.connect(config.db.test);
+
+var gfs = Grid(mongoose.connection.db, mongoose.mongo);
+
 // var cookieParser = require('cookie-parser');
 var url = require('url');
 
@@ -15,9 +22,7 @@ var contacts_v2 = require('./controllers/contacts_v2');
 
 var Contact = require('./models/contact');
 
-var config = require('./config.js');
-
-var router = express.Router();
+// var router = express.Router();
 var app = express();
 
 
@@ -41,8 +46,6 @@ app.use(logger('dev'));
 if ('development' == app.get('env')) {
   app.use(errorHandler());
 }
-
-mongoose.connect(config.db.text);
 
 app.get('/v1/contacts/:primarycontactnumber', function(request, response) {
   console.log(request.url + ': querying for ' + request.params.primarycontactnumber);
@@ -75,6 +78,38 @@ app.get('/v1/contacts', function(request, response) {
   contacts_v1.list(Contact, response);
 });
 
+
+app.get('/v2/contacts/:primarycontactnumber/image', function(request, response) {
+    contacts_v2.getImage(gfs, request.params.primarycontactnumber, response);
+});
+
+app.get('/contacts/:primarycontactnumber/image', function(request, response) {
+    contacts_v2.getImage(gfs, request.params.primarycontactnumber, response);
+});
+
+app.post('/v2/contacts/:primarycontactnumber/image', function(request, response) {
+  contacts_v2.updateImage(gfs, request, response);
+});
+
+app.post('/contacts/:primarycontactnumber/image', function(request, response) {
+  contacts_v2.updateImage(gfs, request, response);
+});
+
+app.put('/v2/contacts/:primarycontactnumber/image', function(request, response) {
+  contacts_v2.updateImage(gfs, request, response);
+});
+
+app.put('/contacts/:primarycontactnumber/image', function(request, response) {
+  contacts_v2.updateImage(gfs, request, response);
+});
+
+app.delete('/v2/contacts/:primarycontactnumber/image', function(request, response) {
+  contacts_v2.deleteImage(gfs, request.params.primarycontactnumber, response);
+});
+
+app.delete('/contacts/:primarycontactnumber/image', function(request, response) {
+  contacts_v2.deleteImage(gfs, request.params.primarycontactnumber, response);
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

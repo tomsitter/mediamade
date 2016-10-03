@@ -1,6 +1,5 @@
 // API for the contact model from the book "RESTful APIs with Node.js second edition"
 
-
 exports.remove = function(model, _primarycontactnumber, response) {
     console.log('Deleting contact with primary number: ' + _primarycontactnumber);
     model.findOne(
@@ -8,7 +7,7 @@ exports.remove = function(model, _primarycontactnumber, response) {
         function(error, data) {
         }
     );
-}
+};
 
 exports.update = function(model, requestBody, response) {
     var primarynumber = requestBody.primarycontactnumber;
@@ -132,7 +131,7 @@ exports.findByNumber = function(model, _primarycontactnumber, response) {
     model.findOne({primarycontactnumber: _primarycontactnumber}, function(error, result) {
         if (error) {
             console.error(error);
-            response.writeHead(500, {'COntact-Type': 'text/plain'});
+            response.writeHead(500, {'Content-Type': 'text/plain'});
             response.end('Internal Server Error');
             return;
         } else {
@@ -158,14 +157,14 @@ exports.list = function(model, response) {
         if (error) {
             console.error(error);
             return null
-        };
+        }
         if (response != null) {
             response.setHeader('Content-Type', 'application/json');
             response.end(JSON.stringify(result));
         }
         return JSON.stringify(result);
     });
-}
+};
 
 exports.query_by_args = function(model, args, response) {
 
@@ -189,7 +188,52 @@ exports.query_by_args = function(model, args, response) {
             }
         }
     });
-}
+};
+
+
+exports.updateImage = function(gfs, request, response) {
+    var _primarycontactnumber = request.params.primarycontactnumber;
+    console.log('Updating image for primary contact number: ' + _primarycontactnumber);
+    request.pipe(gfs.createWriteStream({
+        _id: _primarycontactnumber,
+        filename: 'image',
+        mode: 'w'
+    }));
+    response.send("Successfully uploaded image from primary contact number: " + _primarycontactnumber);
+};
+
+exports.getImage = function(gfs, _primarycontactnumber, response) {
+    console.log('Requesting image for primary contact number: ' + _primarycontactnumber);
+    var imageStream = gfs.createReadStream({
+        _id: _primarycontactnumber,
+        filename: 'image',
+        mode: 'r'
+    });
+
+    imageStream.on('error', function(error) {
+        response.send('404', 'Not found');
+        return;
+    });
+
+    response.setHeader('Content-Type', 'image/jpeg');
+    imageStream.pipe(response);
+};
+
+
+exports.deleteImage = function(gfs, _primarycontactnumber, response) {
+    console.log('Deleting image for primary contact number: ' + _primarycontactnumber);
+    gfs.exist({_id: _primarycontactnumber}, function(error, found) {
+        if (found) {
+            console.log('Found image for primary contact number: ' + _primarycontactnumber);
+            gfs.remove({ _id: _primarycontactnumber }, function(error) {
+                if (error) {
+                    console.log(error);
+                }
+                response.send('Successfully deleted image for primary contact number: ' + _primarycontactnumber);
+            });
+        }
+    });
+};
 
 
 function toContact(body, Contact) {

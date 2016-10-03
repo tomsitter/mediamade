@@ -1,7 +1,8 @@
-var config = {}
+var config = {};
 
 config.db = {
-    'text': 'mongodb://localhost/contacts-test'
-}
+    'test': 'mongodb://localhost/contacts-test',
+    'dev': 'mongodb://localhost/mediamade'
+};
 
 module.exports = config;
