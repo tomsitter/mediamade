@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var mongoosePaginate = require('mongoose-paginate');
+
 
 var ContactSchema = new mongoose.Schema({  
   primarycontactnumber: {
@@ -15,5 +17,8 @@ var ContactSchema = new mongoose.Schema({
   emailaddresses: [String], 
   groups: [String] 
 });
+
+
+ContactSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Contact', ContactSchema);

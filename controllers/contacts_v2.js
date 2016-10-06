@@ -235,6 +235,27 @@ exports.deleteImage = function(gfs, _primarycontactnumber, response) {
     });
 };
 
+exports.paginate = function(model, request, response) {
+    model.paginate(request.body,
+        {"page": request.query.page,
+        "limit": request.query.limit},
+        function(error, result) {
+            if (error) {
+                console.error(error);
+                response.writeHead(500, {'Content-Type': 'text/plain'});
+                response.end('Internal server error');
+                return;
+            }
+            response.json({
+                object: 'contacts',
+                page_count: result.page,
+                search_params: request.body,
+                result: result.docs
+            });
+        }
+    );
+};
+
 
 function toContact(body, Contact) {
     return new Contact(

@@ -6,7 +6,10 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 // var methodOverride = require('method-override');
 var errorHandler = require('errorhandler');
+
 var mongoose = require('mongoose');
+var expressPaginate = require('express-paginate');
+
 var config = require('./config.js');
 
 var Grid = require('gridfs-stream');
@@ -36,6 +39,8 @@ app.set('view engine', 'jade');
 // app.use(methodOverride());
 app.use(bodyParser.json());
 app.use(logger('dev'));
+app.use(expressPaginate.middleware(config.paginate.defaultLimit,
+                                   config.paginate.maxLimit));
 // app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, 'public')));
@@ -65,12 +70,9 @@ app.delete('/v1/contacts/:primarycontactnumber', function(request, response) {
 });
 
 app.get('/contacts', function(request, response) {
-  var args = url.parse(request.url, true).query;
-  if (Object.keys(args).length == 0) {
-    contacts_v2.list(Contact, response);
-  } else {
-    JSON.stringify(contacts_v2.query_by_args(Contact, args, response));
-  }
+  console.log('redirecting to /v2/contacts');
+  response.writeHead(302, {'Location': '/v2/contacts'});
+  response.end('Version 2 is found at URI /v2/contacts');
 });
 
 app.get('/v1/contacts', function(request, response) {
@@ -78,13 +80,23 @@ app.get('/v1/contacts', function(request, response) {
   contacts_v1.list(Contact, response);
 });
 
+// Version 2
+
+app.get('/v2/contacts', function(request, response) {
+  contacts_v2.paginate(Contact, request, response);
+});
+
+// Pagination info (page, limit) are in query params, search parameters are in body
+app.post('/contacts/search', function(request, response) {
+  contacts_v2.paginate(Contact, request, response);
+});
 
 app.get('/v2/contacts/:primarycontactnumber/image', function(request, response) {
-    contacts_v2.getImage(gfs, request.params.primarycontactnumber, response);
+  contacts_v2.getImage(gfs, request.params.primarycontactnumber, response);
 });
 
 app.get('/contacts/:primarycontactnumber/image', function(request, response) {
-    contacts_v2.getImage(gfs, request.params.primarycontactnumber, response);
+  contacts_v2.getImage(gfs, request.params.primarycontactnumber, response);
 });
 
 app.post('/v2/contacts/:primarycontactnumber/image', function(request, response) {
