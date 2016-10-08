@@ -1,5 +1,11 @@
 {
     "http": {
         "port": 8000
+    },
+    "credentials": {
+        "instagram": {
+            "client_id": "dde2cee33a174045be867b5a6969f942",
+            "client_secret": "1e0610b012d74424b6158b756bbccd04"
+        }
     }
 }

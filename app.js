@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var nconf = require('nconf')
 var bodyParser = require('body-parser');
+var passport = require('passport');
+var InstagramStrategy = require('passport-instagram').Strategy;
 
 var users = require('./routes/users');
 
