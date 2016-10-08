@@ -85,6 +85,9 @@ Vagrant.configure("2") do |config|
     sudo apt-get install -y nodejs mongodb-org
 
     # Install npm packages
-    npm install --global express mocha should nodemon mongoose
+    cd /var/www/mediamade
+    npm install
+
+    echo "cd /var/www/mediamade" >> /home/vagrant/.bashrc
   SHELL
 end
