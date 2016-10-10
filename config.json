@@ -2,6 +2,9 @@
     "http": {
         "port": 8000
     },
+    "db": {
+      "connection": "mongodb://localhost/mediamade"
+    },
     "credentials": {
         "instagram": {
             "client_id": "dde2cee33a174045be867b5a6969f942",
