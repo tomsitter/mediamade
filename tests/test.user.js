@@ -17,8 +17,10 @@ describe('User', function () {
 
     beforeEach(function (done) {
         var user = new User({
-            username: '12345',
-            'password': 'testy'
+            'local': {
+                'email': 'tom@email.com',
+                'password': 'testy'
+            }
         });
 
         user.save(function (err) {
@@ -28,10 +30,10 @@ describe('User', function () {
         });
     });
 
-    it('find a user by username', function(done) {
-        User.findOne({username: '12345'}, function(err, user) {
-            user.username.should.eql('12345');
-            console.log("   username: ", user.username);
+    it('find a local user by email', function(done) {
+        User.findOne({'local.email': 'tom@email.com'}, function(err, user) {
+            user.local.email.should.eql('tom@email.com');
+            console.log("   username: ", user.local.email);
             done();
         });
     });
