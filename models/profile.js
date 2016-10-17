@@ -2,14 +2,25 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 var Schema = mongoose.Schema;
 
-var Profile = new Schema({
+var PortfoliaSchema = new Schema({
+    media_type: {type: String, enum: ['VIMEO', 'INSTAGRAM', 'YOUTUBE']},
+    source: {
+        type: String,
+        validate: {
+            validator: isUrl,
+            message: '{VALUE} is not a valid url'
+        }
+    },
+    customer: String,
+    price: String,
+    description: String
+});
+
+var ProfileSchema = new Schema({
     name: {type: String, index: true, required: true},
+    location: String,
     description: String,
     services: [String],
-    equipment: [{
-        equipment_type: String,
-        name: String,
-    }],
     reviews: [{
         reviewer: String,
         rating: {type: Number, enum: [1, 2, 3, 4, 5]},
@@ -20,16 +31,8 @@ var Profile = new Schema({
         role: String,
         blurb: String
     }],
-    portfolio: [{
-        media_type: {type: String, enum: ['VIMEO', 'INSTAGRAM']},
-        source: {
-            type: String,
-            validate: {
-                validator: isUrl,
-                message: '{VALUE} is not a valid url'
-            }
-        }
-    }]
+    hourly_rate: {type: String, required: true},
+    portfolio: [PortfoliaSchema]
 });
 
 function isURL(str) {
@@ -42,4 +45,4 @@ function isURL(str) {
   return pattern.test(str);
 }
 
-module.exports = mongoose.model('Profile', Profile);
+module.exports = mongoose.model('Profile', ProfileSchema);
