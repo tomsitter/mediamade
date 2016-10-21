@@ -1,7 +1,12 @@
-var chai = require('chai');
-var should = chai.should();
 var mongoose = require('mongoose');
 var User = require('../models/user.js');
+
+var chai = require('chai');
+var chaiHttp = require('chai-http');
+var app = require('../app');
+var should = chai.should();
+
+chai.use(chaiHttp);
 
 describe('User', function () {
 

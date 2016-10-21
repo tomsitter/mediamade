@@ -14,15 +14,13 @@ var pug = require('pug');
 var mongoose = require('mongoose');
 var expressPaginate = require('express-paginate');
 var passport = require('passport');
-var session = require('express-session');
 
 nconf.file("config.json");
 
 mongoose.connect(nconf.get("db:connection"));
 
-require('./config/passport')(passport);
+require('./middlewares/passport')(passport);
 
-var index = require('./routes/index.js');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -34,13 +32,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'pug');
 
-app.use(session({secret: 'secretsessionpasscode'}));
 app.use(passport.initialize());
-app.use(passport.session());
 
-require('./routes/users.js')(app, passport);
+var users = require('./routes/users.js')(passport);
+app.use('/api/v1/', users);
 
-app.use('/', index);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
