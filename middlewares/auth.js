@@ -1,15 +1,7 @@
-var jwt = require('jsonwebtoken');
-var nconf = require('nconf');
+nJwt = require('njwt');
+nconf = require('nconf');
 
 module.exports = {
-    generateToken: function(req, res, next) {
-        req.token = jwt.sign({
-            id: req.user.id
-        }, nconf.get("auth:secret"), {
-            expiresIn: '7d'
-        });
-        next();
-    },
     verifyToken: function(req, res, next) {
         // check header or url parameters or post parameters for token
         var token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -18,12 +10,12 @@ module.exports = {
         if (token) {
 
             // verifies secret and checks exp
-            jwt.verify(token, nconf.get("auth:secret"), function(err, decoded) {
+            nJwt.verify(token, nconf.get("auth:secret"), function(err, token) {
               if (err) {
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
               } else {
                 // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
+                req.token = token;
                 next();
               }
             });
@@ -38,6 +30,16 @@ module.exports = {
             });
 
         }
-    }
-};
+    },
 
+    generateToken: function generateToken(id) {
+        var claims = {
+            sub: id,
+            iss: 'https://mediamade.me',
+            permissions: 'user'
+        };
+        var jwt = nJwt.create(claims, nconf.get('auth:secret'));
+        jwt.setExpiration(Date().getTime() + (24*60*60*1000));
+        return jwt.compact();
+    }
+}

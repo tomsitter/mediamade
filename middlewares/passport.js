@@ -2,6 +2,10 @@ var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var winston = require('winston');
+var nJwt = require('njwt');
+var nconf = require('nconf');
+var auth = require('../middlewares/auth');
+
 var logger = new (winston.Logger)({
   transports: [
     new (winston.transports.Console)({ level: 'info' }),
@@ -25,8 +29,9 @@ module.exports = function(passport) {
     passport.use('local-signup', new LocalStrategy({
         usernameField: 'email',
         passwordField: 'password',
+        passReqToCallback: true
     },
-    function(email, password, done) {
+    function(req, email, password, done) {
         process.nextTick(function() {
             User.findOne({'local.email': email}, function(err, user) {
                 logger.info('email: ' + email + 'pw: ' + password);
@@ -44,12 +49,17 @@ module.exports = function(passport) {
                     newUser.local.email = email;
                     newUser.local.password = newUser.generateHash(password);
 
+
                     newUser.save(function(err) {
                         if (err) {
                             throw err;
                         }
+                        var token = auth.generateToken(newUser.id);
+                        req.token = token;
+
                         return done(null, newUser);
                     });
+
                 }
             });
         });
@@ -79,6 +89,8 @@ module.exports = function(passport) {
             }
 
             logger.info('Found customer!');
+            var token = auth.generateToken(user.id);
+            user.token = token;
             return done(null, user);
         });
     }));
@@ -111,8 +123,11 @@ module.exports = function(passport) {
                             if (err) {
                                 throw err;
                             }
+
+                            req.token = token;
                             return done(null, newUser);
                         });
+
                     }
                 });
             } else {
@@ -127,6 +142,8 @@ module.exports = function(passport) {
                     if (err) {
                         throw err;
                     }
+
+                    req.token = token;
                     return done(null, user);
                 });
             }

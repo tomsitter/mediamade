@@ -1,7 +1,7 @@
 var winston = require('winston');
 var router = require('express').Router();
 var User = require('../models/user.js');
-var tokens = require('../middlewares/tokens');
+var auth = require('../middlewares/auth');
 
 module.exports = function (passport) {
 
@@ -55,7 +55,7 @@ module.exports = function (passport) {
         res.send('respond with a resource');
     });
 
-    router.get('/profile', tokens.verifyToken, function(req, res) {
+    router.get('/profile', auth.verifyToken, function(req, res) {
         res.status(200).json({profile:
             {
               "name": "Bad Sitter",
@@ -100,19 +100,16 @@ module.exports = function (passport) {
     // POST for RESTful API
 
     router.post('/signup',
-        passport.authenticate('local-signup', {session: false}),
-        tokens.generateToken, function(req, res) {
+        passport.authenticate('local-signup', {session: false}), function(req, res) {
             res.status(200).json({
-                user: req.user,
                 token: req.token
             });
         });
 
     router.post('/login', passport.authenticate('local-login', {
         session: false
-    }), tokens.generateToken, function(req, res) {
+    }), function(req, res) {
         res.status(200).json({
-            user: req.user,
             token: req.token
         });
     });
