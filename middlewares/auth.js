@@ -39,7 +39,7 @@ module.exports = {
             permissions: 'user'
         };
         var jwt = nJwt.create(claims, nconf.get('auth:secret'));
-        jwt.setExpiration(Date().getTime() + (24*60*60*1000));
+        jwt.setExpiration(new Date().getTime() + (365*24*60*60*1000));
         return jwt.compact();
     }
 }
