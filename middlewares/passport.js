@@ -90,7 +90,7 @@ module.exports = function(passport) {
 
             logger.info('Found customer!');
             var token = auth.generateToken(user.id);
-            user.token = token;
+            req.token = token;
             return done(null, user);
         });
     }));
