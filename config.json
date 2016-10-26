@@ -3,7 +3,8 @@
         "port": 8000
     },
     "db": {
-      "connection": "mongodb://localhost/mediamade"
+        "dev": "mongodb://localhost/mediamade",
+        "test": "mongodb://localhost/test"
     },
     "credentials": {
         "instagram": {

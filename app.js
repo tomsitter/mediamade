@@ -16,18 +16,24 @@ var expressPaginate = require('express-paginate');
 var passport = require('passport');
 var cors = require('cors');
 
-
 nconf.file("config.json");
 
-mongoose.connect(nconf.get("db:connection"));
+if (app.get('env') === 'test') {
+    mongoose.connect(nconf.get("db:test"));
+} else {
+    mongoose.connect(nconf.get("db:dev"));
+}
 
 require('./middlewares/passport')(passport);
+
+if (process.env.NODE_ENV !== 'test') {
+    app.use(logger('dev'));
+}
 
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(cors());
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
