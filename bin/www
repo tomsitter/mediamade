@@ -7,23 +7,22 @@
 var app = require('../app');
 var nconf = require('nconf');
 var debug = require('debug')('mediamade:server');
-var https = require('https');
+var http = require('http');
 var fs = require('fs');
 
-var privateKey = fs.readFileSync('sslcert/mediamade-key.pem', 'utf8');
-var certificate = fs.readFileSync('sslcert/mediamade-cert.pem', 'utf8');
 
-var sslOptions = {"key": privateKey, "cert": certificate};
+nconf.argv().env().file({file: 'config.json'});
 
 /**
  * Create HTTP server.
  */
 
-var server = https.createServer(sslOptions, app);
+var server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
+
 
 server.listen(nconf.get('http:port'));
 server.on('error', onError);
