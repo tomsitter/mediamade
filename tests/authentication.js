@@ -12,7 +12,7 @@ var chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);
 
-describe('Sign Up', function () {
+describe('Local Sign Up', function () {
 
     before(function (done) {
         User.remove({}, function() {
@@ -51,7 +51,7 @@ describe('Sign Up', function () {
     });
 });
 
-describe('Log In', function() {
+describe('Local Log In', function() {
     before(function (done) {
         User.remove({}, function() {
             done();
@@ -99,6 +99,35 @@ describe('Log In', function() {
     });
 });
 
+describe('Google Login', function() {
+    before(function(done) {
+        User.remove({}, function() {
+            done();
+        });
+    });
+
+    it('should have no users at the start', function(done) {
+        User.find({}, function(err, users) {
+            should.not.exist(err);
+            users.should.have.length(0);
+            done();
+        });
+    });
+
+    it('should create a new user', function(done) {
+        chai.request(app).post('/api/v1/signup')
+            .send({'email': 'test@test.com', 'password': 'test'})
+            .end(function(err, res) {
+                should.not.exist(err);
+                res.should.have.status(200);
+                res.body.should.have.property('token');
+                done();
+        });
+    });
+
+});
+
+
 describe('Profile', function() {
     before(function (done) {
         User.remove({}, function() {
@@ -136,7 +165,7 @@ describe('Profile', function() {
         });
     });
 
-    it('should return a profile when passed an authorized token', function(done) {
+    it('should return all profiles when passed an authorized token', function(done) {
         chai.request(app).post('/api/v1/login')
             .send({'email': 'test@test.com', 'password': 'test'})
             .end(function(err, res) {
@@ -150,8 +179,9 @@ describe('Profile', function() {
                     .end(function(err, res) {
                         should.not.exist(err);
                         res.should.have.status(200);
-                        res.body.should.have.property('profile');
-                        res.body.profile.should.be.an('object');
+                        res.body.profiles.should.have.length(1);
+                        var profile = res.body.profiles[0];
+                        profile.should.be.an('object');
                         done();
                 });
         });

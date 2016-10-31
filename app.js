@@ -44,8 +44,10 @@ app.set('view engine', 'pug');
 app.use(passport.initialize());
 
 var users = require('./routes/users.js')(passport);
+var profiles = require('./routes/profiles.js')(passport);
 
 app.use('/api/v1/', users);
+app.use('/api/v1/', profiles);
 
 
 // catch 404 and forward to error handler

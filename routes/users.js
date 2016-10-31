@@ -55,42 +55,6 @@ module.exports = function (passport) {
         res.send('respond with a resource');
     });
 
-    router.get('/profile', auth.verifyToken, function(req, res) {
-        res.status(200).json({profile:
-            {
-              "name": "Bad Sitter",
-              "location": "Toronto",
-              "description": "We are a bad ass media production company.",
-              "services": ["AUDIO", "VIDEO", "AERIAL", "ANIMATION"],
-              "reviews": [{
-                "reviewer": "Tom Sitter",
-                "rating": 1,
-                "review": "WTF did I just purchase???"
-              }],
-              "team": [
-                {
-                  "name": "Greg Smith",
-                  "role": "Director",
-                  "blurb": "Greg has a long career in directing BDSM and alternative pornos"
-                },
-                {
-                  "name": "Spencer Badanai",
-                  "role": "Actor",
-                  "blurb": "Spencer has long dreamed to work as a gay pornstar in BDSM shoots"
-                }
-              ],
-              "hourly_rate": "$1000 per 1 minute finished product",
-              "portfolio": [{
-                "media_type": "YOUTUBE",
-                "source": "https://www.youtube.com/watch?v=VkJd4h5T2kg",
-                "customer": "Tom Sitter",
-                "price": "$1000",
-                "description": "A short extreme anal penetration video"
-              }]
-            }
-        });
-    });
-
     router.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
