@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 var Schema = mongoose.Schema;
 
-var PortfoliaSchema = new Schema({
+var PortfolioSchema = new Schema({
     media_type: {type: String, enum: ['VIMEO', 'INSTAGRAM', 'YOUTUBE']},
     source: {
         type: String,
@@ -18,7 +18,14 @@ var PortfoliaSchema = new Schema({
 
 var ProfileSchema = new Schema({
     name: {type: String, index: true, required: true},
-    location: String,
+    location: {
+        address: String,
+        city: String,
+        geo: {
+            type: [Number], // [<longitude>, <latitude>]
+            index: '2d'
+        }
+    },
     description: String,
     services: [String],
     reviews: [{
