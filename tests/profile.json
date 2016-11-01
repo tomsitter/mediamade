@@ -1,6 +1,10 @@
 {
   "name": "Bad Sitter",
-  "location": "Toronto",
+  "location": {
+    "address": "123 Fake St",
+    "city": "Thunder Bay",
+    "geo": [89.5043, 43.5678]
+  },
   "description": "We are a bad ass media production company.",
   "services": ["AUDIO", "VIDEO", "AERIAL", "ANIMATION"],
   "reviews": [{
