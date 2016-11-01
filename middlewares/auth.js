@@ -10,12 +10,13 @@ module.exports = {
         if (token) {
 
             // verifies secret and checks exp
-            nJwt.verify(token, nconf.get("auth:secret"), function(err, token) {
+            nJwt.verify(token, nconf.get("auth:secret"), function(err, verifiedJwt) {
               if (err) {
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
               } else {
                 // if everything is good, save to request for use in other routes
-                req.token = token;
+                console.log(verifiedJwt.body);
+                req.userId = verifiedJwt.body.sub;
                 next();
               }
             });

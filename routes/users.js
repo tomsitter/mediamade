@@ -1,6 +1,7 @@
 var winston = require('winston');
 var router = require('express').Router();
 var User = require('../models/user.js');
+var Profile = require('../models/profile.js');
 var auth = require('../middlewares/auth');
 
 module.exports = function (passport) {
@@ -48,35 +49,46 @@ module.exports = function (passport) {
     router.get('/connect/google',
         passport.authorize('google', {scope: ['profile', 'email']}));
 
-
-    /* GET users listing. */
-
-    router.get('/users', function(req, res, next) {
-        res.send('respond with a resource');
+    router.post('/profile', auth.verifyToken, function(req, res, next) {
+        User.findById(req.userId, function(err, user) {
+            var profile = new Profile(req.body);
+            profile.save(function(err, profile) {
+                user.profile = profile.id;
+                user.save(function (err, user) {
+                if (err) {
+                    return next(err);
+                }
+                res.status(201).json(profile);
+              });
+            });
+        });
     });
 
-    router.get('/logout', function(req, res) {
-        req.logout();
-        res.redirect('/');
+    router.get('/profile', auth.verifyToken, function(req, res, next) {
+        User.findById(req.userId, function(err, user) {
+            Profile.findById(user.profile, function(err, profile) {
+                res.status(201).json(profile);
+            });
+        });
     });
-
 
     // POST for RESTful API
 
-    router.post('/signup',
-        passport.authenticate('local-signup', {session: false}), function(req, res) {
+    router.post('/signup', passport.authenticate('local-signup', {session: false}),
+        function(req, res) {
             res.status(200).json({
-                token: req.token
+                token: req.body.token
             });
-        });
+        }
+    );
 
-    router.post('/login', passport.authenticate('local-login', {
-        session: false
-    }), function(req, res) {
-        res.status(200).json({
-            token: req.token
-        });
-    });
+    router.post('/login', passport.authenticate('local-login', {session: false}),
+        function(req, res) {
+            res.status(200).json({
+                token: req.body.token
+            });
+        }
+    );
 
     return router;
 };

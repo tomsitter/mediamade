@@ -2,7 +2,6 @@ var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var winston = require('winston');
-var nJwt = require('njwt');
 var nconf = require('nconf');
 var auth = require('../middlewares/auth');
 
@@ -15,16 +14,6 @@ var logger = new (winston.Logger)({
 var User = require('../models/user');
 
 module.exports = function(passport) {
-
-    passport.serializeUser(function(user, done) {
-        done(null, user.id);
-    });
-
-    passport.deserializeUser(function(id, done) {
-        User.findById(id, function(err, user) {
-            done(err, user);
-        });
-    });
 
     passport.use('local-signup', new LocalStrategy({
         usernameField: 'email',
@@ -71,7 +60,6 @@ module.exports = function(passport) {
         passReqToCallback: true
     },
     function(req, email, password, done) {
-        logger.info('email: ' + email + ' pw: ' + password);
         User.findOne({'local.email': email}, function (err, user) {
             if (err) {
                 logger.info(err);
@@ -88,7 +76,6 @@ module.exports = function(passport) {
                 return done(null, false);
             }
 
-            logger.info('Found customer!');
             var token = auth.generateToken(user.id);
             req.token = token;
             return done(null, user);
@@ -150,16 +137,46 @@ module.exports = function(passport) {
         });
     }));
 
-    // passport.use(new GoogleStrategy({
-    //         clientID: '',
-    //         clientSecret: '',
-    //         callbackURL: '',
-    //         passReqToCallback: true
-    //     },
-    //     function(req, token, refreshToken, profile, done) {
-    //         User.findOne({'google.id': profile.id }, function(err, user) {
-    //             return done(err, user);
-    //         });
-    //     }
-    // ));
+    passport.use(new GoogleStrategy({
+            clientID: nconf.get('credentials:google:client_id'),
+            clientSecret: nconf.get('credentials:google:client_secret'),
+            callbackURL: 'https://mediamade.me/auth/google/callback/',
+            passReqToCallback: true
+        },
+        function(req, token, refreshToken, profile, done) {
+            process.nextTick(function () {
+                User.findOne({'google.id': profile.id}, function (err, user) {
+                    if (err) {
+                        logger.info(err);
+                        return done(err);
+                    }
+
+                    if (user) {
+                        req.token = token;
+                        return done(null, user);
+                    } else {
+                        var newUser = new User();
+
+                        newUser.google.id = profile.id;
+                        newUser.google.token = token;
+                        newUser.google.name = profile.displayName;
+                        newUser.google.email = profile.emails[0].value;
+
+                        newUser.save(function(err) {
+                            if (err) {
+                                throw err;
+                            }
+
+                            req.token = token;
+                            return done(null, newUser);
+                        });
+
+                    }
+
+
+                });
+            });
+        }
+    ));
+
 };
