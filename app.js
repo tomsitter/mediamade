@@ -15,18 +15,20 @@ var mongoose = require('mongoose');
 var expressPaginate = require('express-paginate');
 var passport = require('passport');
 var cors = require('cors');
-
 nconf.file("config.json");
 
 if (app.get('env') === 'test') {
+
     mongoose.connect(nconf.get("db:test"));
 } else {
     mongoose.connect(nconf.get("db:dev"));
 }
-
 require('./middlewares/passport')(passport);
 
+
+
 if (process.env.NODE_ENV !== 'test') {
+
     app.use(logger('dev'));
 }
 
@@ -44,10 +46,10 @@ app.set('view engine', 'pug');
 app.use(passport.initialize());
 
 var users = require('./routes/users.js')(passport);
-var profiles = require('./routes/profiles.js')(passport);
+var profiles = require('./routes/profiles.js');
 
-app.use('/api/v1/', users);
-app.use('/api/v1/', profiles);
+app.use('/api', users);
+app.use('/api', profiles);
 
 
 // catch 404 and forward to error handler

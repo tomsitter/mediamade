@@ -25,7 +25,9 @@ var PortfolioSchema = new Schema({
 });
 
 var ProfileSchema = new Schema({
+    user:  {type: Schema.Types.ObjectId, ref: 'User', index: true},
     name: {type: String, index: true, required: true},
+    tags: [{type: String, index: true}],
     location: {
         address: String,
         city: String,
@@ -35,7 +37,7 @@ var ProfileSchema = new Schema({
         }
     },
     description: String,
-    services: [String],
+    services: [{type: String, index: true}],
     reviews: [{
         reviewer: String,
         rating: {type: Number, enum: [1, 2, 3, 4, 5]},
@@ -46,7 +48,7 @@ var ProfileSchema = new Schema({
         role: String,
         blurb: String
     }],
-    hourly_rate: {type: String, required: true},
+    hourly_rate: {type: String, index: true},
     portfolio: [PortfolioSchema]
 });
 

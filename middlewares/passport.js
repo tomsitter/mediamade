@@ -3,15 +3,16 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var winston = require('winston');
 var nconf = require('nconf');
-var auth = require('../middlewares/auth');
+
+var generateToken = require('../middlewares/auth').generateToken;
+
+var User = require('../models/user');
 
 var logger = new (winston.Logger)({
   transports: [
     new (winston.transports.Console)({ level: 'info' }),
   ]
 });
-
-var User = require('../models/user');
 
 module.exports = function(passport) {
 
@@ -23,14 +24,14 @@ module.exports = function(passport) {
     function(req, email, password, done) {
         process.nextTick(function() {
             User.findOne({'local.email': email}, function(err, user) {
-                logger.info('email: ' + email + 'pw: ' + password);
+                logger.info('email: ' + email + ' pw: ' + password);
                 if (err) {
                     logger.error("Error signing up: " + err);
                     return done(err);
                 }
 
                 if (user) {
-                    logger.error('User already exists!');
+                    logger.error('User ' + user + ' already exists!');
                     return done(null, false);
                 } else {
                     logger.error('Making a new user!');
@@ -43,8 +44,8 @@ module.exports = function(passport) {
                         if (err) {
                             throw err;
                         }
-                        var token = auth.generateToken(newUser.id);
-                        req.token = token;
+
+                        req.token = generateToken(newUser.id);
 
                         return done(null, newUser);
                     });
@@ -76,7 +77,7 @@ module.exports = function(passport) {
                 return done(null, false);
             }
 
-            var token = auth.generateToken(user.id);
+            var token = generateToken(user.id);
             req.token = token;
             return done(null, user);
         });
