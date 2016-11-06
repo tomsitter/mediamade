@@ -1,7 +1,6 @@
 var winston = require('winston');
 var router = require('express').Router();
 var auth = require('../middlewares/auth');
-var profiles = require('../controllers/profiles.js');
 var Profile = require('../models/profile.js');
 
 function handleError(res, reason, message, code) {
