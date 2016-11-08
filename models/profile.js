@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var bcrypt   = require('bcrypt-nodejs');
 var Schema = mongoose.Schema;
 
 
@@ -25,8 +24,9 @@ var PortfolioSchema = new Schema({
 });
 
 var ProfileSchema = new Schema({
-    user:  {type: Schema.Types.ObjectId, ref: 'User', index: true},
+    user_id:  {type: Schema.Types.ObjectId, ref: 'User', index: true},
     name: {type: String, index: true, required: true},
+    client_type: {type: String, index: true, required: true},
     tags: [{type: String, index: true}],
     location: {
         address: String,

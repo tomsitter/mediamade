@@ -21,7 +21,7 @@ router.route('/v1/profile')
             handleError(res, "Invalid User ID", "Something wrong with token", 500);
         }
 
-        Profile.count({user: req.userId}, function(err, count) {
+        Profile.count({user_id: req.userId}, function(err, count) {
             console.log("Found " + count + " existing profiles for this user");
             if (count>0) {
                 res.status(401).json({"error": "Profile already exists for this user"});
@@ -29,7 +29,7 @@ router.route('/v1/profile')
                 var newProfile = new Profile();
 
                 newProfile.name = req.body.name;
-                newProfile.user = req.userId;
+                newProfile.user_id = req.userId;
                 newProfile.description = req.body.description || '';
                 newProfile.location.address = req.body.address || '';
                 newProfile.services = req.body.services || [];
@@ -52,7 +52,7 @@ router.route('/v1/profile')
 
     })
     .put(function(req, res) {
-        Profile.findOne({user: req.userId}, function(err, profile) {
+        Profile.findOne({user_id: req.userId}, function(err, profile) {
             if (err) {
                 handleError(res, err.message, "Failed to update user profile");
             } else if (!profile) {
@@ -85,7 +85,7 @@ router.route('/v1/profile')
         });
     })
     .get(function(req, res) {
-        Profile.findOne({user: req.userId}, function (err, profile) {
+        Profile.findOne({user_id: req.userId}, function (err, profile) {
             if (err) {
                 handleError(res, "No profile", "Can't find profile for this user", 404);
             }
@@ -95,7 +95,7 @@ router.route('/v1/profile')
     });
 
 router.get('/v1/profile/:id', function(req, res, next) {
-    Profile.findOne({user: req.params.id}, function(err, profile) {
+    Profile.findOne({user_id: req.params.id}, function(err, profile) {
         if (err) {
             handleError(res, "No profile", "Can't find profile for specified user", 404);
         }
