@@ -23,9 +23,6 @@ if (app.get('env') === 'test') {
 } else {
     mongoose.connect(nconf.get("db:dev"));
 }
-require('./middlewares/passport')(passport);
-
-
 
 if (process.env.NODE_ENV !== 'test') {
 
@@ -45,12 +42,11 @@ app.set('view engine', 'pug');
 
 app.use(passport.initialize());
 
-var users = require('./routes/users.js')(passport);
-var profiles = require('./routes/profiles.js');
+app.use('/api1', require('./routes/waitlist.js'));
 
-app.use('/api', users);
-app.use('/api', profiles);
-
+// Authentication required below
+app.use('/api', require('./routes/users.js')(passport));
+app.use('/api', require('./routes/profiles.js'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
