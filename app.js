@@ -42,7 +42,7 @@ app.set('view engine', 'pug');
 
 app.use(passport.initialize());
 
-app.use('/api1', require('./routes/waitlist.js'));
+app.use('/api', require('./routes/waitlist.js'));
 
 // Authentication required below
 app.use('/api', require('./routes/users.js')(passport));

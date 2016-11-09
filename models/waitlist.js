@@ -7,7 +7,8 @@ var WaitListSchema = new Schema({
     client_type: {type: String, index: true, required: true},
     services: [{type: String, index: true}],
     city: String,
-    expected_rate: [{service: String, rate: Number}],
+    photo_price: Number,
+    video_price: Number
 });
 
 

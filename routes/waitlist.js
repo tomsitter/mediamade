@@ -16,7 +16,8 @@ router.post('/v1/waitlist',
             client_type: Joi.string(),
             services: Joi.array().items(Joi.string()),
             city: Joi.string(),
-            expected_rate: Joi.array().items(Joi.object())
+            photo_price: [Joi.string(), Joi.number()],
+            video_price: [Joi.string(), Joi.number()]
           })
     }),
     function(req, res) {
@@ -25,17 +26,16 @@ router.post('/v1/waitlist',
             if (count>0) {
                 res.status(401).json({"error": "User is already on the waitlist"});
             } else {
-                var newCustomer = new WaitList(req.body);
+                var newSurvey = new WaitList(req.body);
 
-
-                WaitList.create(newCustomer, function(err, customer) {
+                WaitList.create(newSurvey, function(err, survey) {
                         if (err) {
                             console.log(req.body);
-                            console.log(customer);
+                            console.log(survey);
                             handleError(res, err.message, "Failed to save customer");
                         } else {
                             console.log('Saved new customer to waiting list!');
-                            res.status(201).json(customer);
+                            res.status(201).json(survey);
                         }
                     }
                 );
