@@ -7,25 +7,26 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var nconf = require('nconf');
 var bodyParser = require('body-parser');
 
 var pug = require('pug');
 var mongoose = require('mongoose');
 var expressPaginate = require('express-paginate');
-var passport = require('passport');
 var cors = require('cors');
+
+var nconf = require('nconf');
 nconf.file("config.json");
 
-if (app.get('env') === 'test') {
+var passport = require('passport');
+require('./middlewares/passport')(passport);
 
+if (app.get('env') === 'test') {
     mongoose.connect(nconf.get("db:test"));
 } else {
     mongoose.connect(nconf.get("db:dev"));
 }
 
 if (process.env.NODE_ENV !== 'test') {
-
     app.use(logger('dev'));
 }
 
@@ -40,13 +41,14 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'pug');
 
-app.use(passport.initialize());
-
 app.use('/api', require('./routes/waitlist.js'));
 
 // Authentication required below
 app.use('/api', require('./routes/users.js')(passport));
+
+// Token required
 app.use('/api', require('./routes/profiles.js'));
+app.use('/api', require('./routes/jobs.js'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
