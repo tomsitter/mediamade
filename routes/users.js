@@ -29,7 +29,7 @@ module.exports = function (passport) {
 
     // POST for RESTful API
 
-    router.post('/signup', passport.authenticate('local-signup', {session: false}),
+    router.post('/v1/signup', passport.authenticate('local-signup', {session: false}),
         function(req, res) {
             res.status(200).json({
                 token: req.token
@@ -37,7 +37,7 @@ module.exports = function (passport) {
         }
     );
 
-    router.post('/login', passport.authenticate('local-login', {session: false}),
+    router.post('/v1/login', passport.authenticate('local-login', {session: false}),
         function(req, res) {
             res.status(200).json({
                 token: req.token
