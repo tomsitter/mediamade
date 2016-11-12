@@ -2,6 +2,8 @@ var mongoose = require('bluebird').promisifyAll(require('mongoose'));
 var Schema = mongoose.Schema;
 
 var ContractSchema = new Schema({
+    date_created: {type: Date, default: Date.now},
+    producer: {type: Schema.Types.ObjectId, ref: 'User', index: true},
     text: String,
     price: String,
     milestones: [{
@@ -22,7 +24,9 @@ var ContractSchema = new Schema({
 });
 
 var JobSchema = new Schema({
-    user:  {type: Schema.Types.ObjectId, ref: 'User', index: true},
+    user_id:  {type: Schema.Types.ObjectId, ref: 'User', index: true},
+    date_created: {type: Date, default: Date.now},
+    status: {type: String, index: true, default: "pending"},
     services: [String],
     products: [{
         product_type: {type: String, required: true},
