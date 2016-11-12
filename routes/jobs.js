@@ -62,7 +62,9 @@ router.put('/v1/jobs/:id',
                 } else {
                     var updatedJob = updateDocument(job, Job, req.body);
                     updatedJob.save(function(err) {
-                        handleError(res, err.message, "Failed to update job", 500);
+                        if (err) {
+                            handleError(res, err.message, "Failed to update job", 500);
+                        }
                     });
                     res.status(200).json(updatedJob);
                 }
@@ -85,6 +87,22 @@ router.get('/v1/jobs/:id',
             })
             .catch(function(err) {
                 handleError(res, err.message, "Failed to retrieve job", 500);
+            });
+    }
+);
+
+router.get('/v1/jobs',
+    function(req, res) {
+        Job.find({"user_id": req.userId}).exec()
+            .then(function(jobs) {
+                if (jobs.length == 0) {
+                    res.status(401).json({"error": "No jobs found"});
+                } else {
+                    res.status(200).json(jobs);
+                }
+            })
+            .catch(function(err) {
+                handleError(res, err.message, "Failed to retrieve jobs", 500);
             });
     }
 );

@@ -13,7 +13,10 @@ chai.use(chaiHttp);
 describe("Jobs", function() {
 
     var app, authMock;
-    var userId, jobId;
+    var jobId;
+    var mainUserId = mongoose.Types.ObjectId();
+    var altUserId = mongoose.Types.ObjectId();
+    var userId = mainUserId;
 
     before(function (done) {
         mockery.enable({
@@ -23,9 +26,6 @@ describe("Jobs", function() {
         });
         authMock = {
             verifyToken: function (req, res, next) {
-               if (!userId) {
-                    userId = mongoose.Types.ObjectId();
-                }
                 req.userId = userId;
                 next();
             }
@@ -96,8 +96,26 @@ describe("Jobs", function() {
 
     it("not find a pending job with the wrong user Id", function(done) {
         // replace the user Id with a different one
-        userId = mongoose.Types.ObjectId();
+        userId = altUserId;
         chai.request(app).get("/api/v1/jobs/" + jobId + "?token=wrongusertoken")
+            .end(function(err, res) {
+                res.should.have.status(401);
+                done();
+            });
+    });
+
+    it("finds all jobs for main user", function(done) {
+       userId = mainUserId;
+        chai.request(app).get("/api/v1/jobs?token=mainusertoken")
+            .end(function(err, res) {
+                res.should.have.status(200);
+                done();
+            });
+    });
+
+    it("finds NO jobs for alt user", function(done) {
+       userId = altUserId;
+        chai.request(app).get("/api/v1/jobs?token=altusertoken")
             .end(function(err, res) {
                 res.should.have.status(401);
                 done();
