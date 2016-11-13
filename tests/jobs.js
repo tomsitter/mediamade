@@ -122,5 +122,23 @@ describe("Jobs", function() {
             });
     });
 
+    it("deletes NO jobs for alt user", function(done) {
+        userId = altUserId;
+        chai.request(app).delete("/api/v1/jobs/" + jobId + "?token=altusertoken")
+            .end(function(err, res) {
+                res.should.have.status(401);
+                done();
+            });
+    });
+
+    it("deletes the job for main user", function(done) {
+        userId = mainUserId;
+        chai.request(app).delete("/api/v1/jobs/" + jobId + "?token=mainusertoken")
+            .end(function(err, res) {
+                res.should.have.status(200);
+                res.body._id.should.equal(jobId);
+                done();
+            });
+    });
 
 });

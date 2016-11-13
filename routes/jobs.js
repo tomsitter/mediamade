@@ -108,7 +108,17 @@ router.get('/v1/jobs',
 );
 
 router.delete('/v1/jobs/:id', function(req, res) {
-
+    Job.findOne({_id: req.params.id, user_id: req.userId}).exec()
+        .then(function(job) {
+            if (!job) {
+                res.status(401).json({"error": "Job not found"});
+            } else {
+                res.status(200).json(job);
+            }
+        })
+        .catch(function(err) {
+            handleError(res, err.message, "Failed to delete job", 500);
+        });
 });
 
 module.exports = router;
