@@ -3,6 +3,7 @@
         "port": 8000
     },
     "db": {
+        "mlab": "mongodb://mediamade:mediamadedb@ds153667.mlab.com:53667/mediamade-dev",
         "dev": "mongodb://localhost/mediamade",
         "test": "mongodb://localhost/test"
     },

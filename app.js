@@ -23,7 +23,7 @@ require('./middlewares/passport')(passport);
 if (app.get('env') === 'test') {
     mongoose.connect(nconf.get("db:test"));
 } else {
-    mongoose.connect(nconf.get("db:dev"));
+    mongoose.connect(nconf.get("db:mlab"));
 }
 
 if (process.env.NODE_ENV !== 'test') {
