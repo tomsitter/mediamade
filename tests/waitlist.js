@@ -21,7 +21,8 @@ describe("WaitList", function() {
     var testSurvey = {
         email: "test@gmail.com",
         survey: {
-            client_type: "ClIENT",
+            client_type: "CLIENT",
+            hiring: "PERSONAL",
             services: ["PHOTOS", "VIDEO"],
             city: "Thunder Bay",
             photo_price: "100",
