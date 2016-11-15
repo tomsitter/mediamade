@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var SurveySchema = new Schema({
     client_type: {type: String, index: true, required: true},
+    hiring: {type: String, index: true},
     services: [{type: String, index: true}],
     city: String,
     photo_price: Number,

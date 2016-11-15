@@ -15,6 +15,7 @@ router.post('/v1/waitlist',
             email: Joi.string().email().required(),
             survey: Joi.object().keys({
                 client_type: Joi.string(),
+                hiring: Joi.string(),
                 services: Joi.array().items(Joi.string()),
                 city: Joi.string(),
                 photo_price: [Joi.string(), Joi.number()],
