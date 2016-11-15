@@ -24,7 +24,6 @@ module.exports = function(passport) {
     function(req, email, password, done) {
         process.nextTick(function() {
             User.findOne({'local.email': email}, function(err, user) {
-                logger.info('email: ' + email + ' pw: ' + password);
                 if (err) {
                     logger.error("Error signing up: " + err);
                     return done(err);
@@ -34,7 +33,6 @@ module.exports = function(passport) {
                     logger.error('User ' + user + ' already exists!');
                     return done(null, false);
                 } else {
-                    logger.error('Making a new user!');
                     var newUser = new User();
                     newUser.local.email = email;
                     newUser.local.password = newUser.generateHash(password);
