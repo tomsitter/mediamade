@@ -1,5 +1,22 @@
 var winston = require('winston');
 var router = require('express').Router();
+var validate = require('celebrate');
+var Joi = require('joi');
+
+var signupValidation = {
+    body: Joi.object().keys({
+        email: Joi.string().email().required(),
+        password: Joi.string().required(),
+        user_type: Joi.string().required(),
+    })
+};
+
+var loginValidation = {
+    body: Joi.object().keys({
+        email: Joi.string().email().required(),
+        password: Joi.string().required(),
+    })
+};
 
 module.exports = function (passport) {
 
@@ -29,7 +46,9 @@ module.exports = function (passport) {
 
     // POST for RESTful API
 
-    router.post('/v1/signup', passport.authenticate('local-signup', {session: false}),
+    router.post('/v1/signup',
+        validate(signupValidation),
+        passport.authenticate('local-signup', {session: false}),
         function(req, res) {
             res.status(200).json({
                 token: req.token
@@ -37,13 +56,17 @@ module.exports = function (passport) {
         }
     );
 
-    router.post('/v1/login', passport.authenticate('local-login', {session: false}),
+    router.post('/v1/login',
+        validate(loginValidation),
+        passport.authenticate('local-login', {session: false}),
         function(req, res) {
             res.status(200).json({
                 token: req.token
             });
         }
     );
+
+    router.use(validate.errors());
 
     return router;
 };
