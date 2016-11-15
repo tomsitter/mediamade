@@ -1,8 +1,36 @@
-# mediamade
-MediaMade main repository
+# MediaMade API
+
+# Endpoints
+
+## Authentication
+
+### /api/v1/signup
+Creates a new user account and returns an authentication token
+
+### /api/v1/login
+Accepts user login credentials and returns an authentication token
+
+## Profiles
+Create, edit, and view user profiles
+
+### GET /api/v1/profile
+
+### GET /api/v1/profile/:id
+
+### POST /api/v1/profile
+
+### PUT /api/v1/profile
 
 
-To Do:
+## Jobs
+Create, edit, and view jobs
+
+## Wait List
+Register for the mediamade waitlist. Accepts email and surveys
+
+
+
+# To Do:
 
 As a Company looking to hire media:
 
