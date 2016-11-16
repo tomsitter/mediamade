@@ -14,6 +14,7 @@ function isUrl(str) {
 
 var PortfolioSchema = new Schema({
     media_type: {type: String, enum: ['VIMEO', 'INSTAGRAM', 'YOUTUBE']},
+    date_created: {type: Date, default: Date.now},
     source: {
         type: String,
         validate: [isUrl, 'Not a URL'],
@@ -25,6 +26,7 @@ var PortfolioSchema = new Schema({
 
 var ProfileSchema = new Schema({
     user_id:  {type: Schema.Types.ObjectId, ref: 'User', index: true},
+    date_created: {type: Date, default: Date.now},
     name: {type: String, index: true, required: true},
     client_type: {type: String, index: true, required: true},
     tags: [{type: String, index: true}],
