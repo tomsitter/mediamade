@@ -21,35 +21,38 @@ router.route('/v1/profile')
             handleError(res, "Invalid User ID", "Something wrong with token", 500);
         }
 
-        Profile.count({user_id: req.userId}, function(err, count) {
-            console.log("Found " + count + " existing profiles for this user");
-            if (count>0) {
-                res.status(401).json({"error": "Profile already exists for this user"});
+        Profile.findOne({user_id: req.userId}, function(err, profile) {
+            if (err) handleError(res, err.message, "Failed to create profile", 500);
+
+            var newProfile = {
+                name: req.body.name,
+                client_type : req.body.client_type || "",
+                user_id : req.userId,
+                description : req.body.description || "",
+                location : {address: req.body.address || ""},
+                services : req.body.services || [],
+                tags : req.body.tags || [],
+                hourly_rate : req.body.hourly_rate || ""
+            };
+
+            if (profile) {
+                Profile.update({_id: profile.id}, newProfile)
+                    .then(function(createdProfile) {
+                        res.status(200).json(createdProfile);
+                    })
+                    .catch(function(err) {
+                        handleError(res, err.message, "Failed to update profile", 500);
+                    });
             } else {
-                var newProfile = new Profile();
-
-                newProfile.name = req.body.name;
-                newProfile.user_id = req.userId;
-                newProfile.description = req.body.description || '';
-                newProfile.location.address = req.body.address || '';
-                newProfile.services = req.body.services || [];
-                newProfile.tags = req.body.tags || [];
-                newProfile.hourly_rate = req.body.hourly_rate || '';
-
-                console.log('Creating profile for user: ' + req.userId);
-
-                Profile.create(newProfile, function(err, profile) {
-                        if (err) {
-                            handleError(res, err.message, "Failed to create new profile");
-                        } else {
-                            console.log('Saved new profile!');
-                            res.status(201).json(profile);
-                        }
-                    }
-                );
+                Profile.create(newProfile)
+                    .then(function(createdProfile) {
+                        res.status(201).json(createdProfile);
+                    })
+                    .catch(function(err) {
+                        handleError(res, err.message, "Failed to create profile", 500);
+                    });
             }
         });
-
     })
     .put(function(req, res) {
         Profile.findOne({user_id: req.userId}, function(err, profile) {
@@ -65,7 +68,6 @@ router.route('/v1/profile')
                 if (!req.userId) {
                     handleError(res, "Invalid User ID", "Something wrong with token", 500);
                 }
-                console.log(profile);
 
                 profile.name = req.body.name;
                 profile.description = req.body.description || '';
@@ -79,7 +81,7 @@ router.route('/v1/profile')
                     if (err) {
                         handleError(res, err.message, "Failed to save new profile");
                     }
-                    res.status(201).json({profile: profile});
+                    res.status(200).json(profile);
                 });
             }
         });
@@ -90,17 +92,17 @@ router.route('/v1/profile')
                 handleError(res, "No profile", "Can't find profile for this user", 404);
             }
 
-            res.status(201).json(profile);
+            res.status(200).json(profile);
         });
     });
 
-router.get('/v1/profile/:id', function(req, res, next) {
+router.get('/v1/profile/:id', function(req, res) {
     Profile.findOne({user_id: req.params.id}, function(err, profile) {
         if (err) {
             handleError(res, "No profile", "Can't find profile for specified user", 404);
         }
 
-        res.status(201).json(profile);
+        res.status(200).json(profile);
     });
 });
 

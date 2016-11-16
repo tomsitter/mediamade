@@ -52,6 +52,11 @@ var ProfileSchema = new Schema({
     portfolio: [PortfolioSchema]
 });
 
+ProfileSchema.pre('save', function (next) {
+  this.wasNew = this.isNew;
+  next();
+})
+
 
 
 module.exports = mongoose.model('Profile', ProfileSchema);

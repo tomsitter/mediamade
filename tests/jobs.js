@@ -39,9 +39,9 @@ describe("Jobs", function() {
 
     after(function (done) {
         mockery.disable();
-        // Job.remove({}, function() {
+        Job.remove({}, function() {
             done();
-        // });
+        });
 
     });
 
@@ -62,7 +62,7 @@ describe("Jobs", function() {
     };
 
 
-    it("create a new profile", function(done) {
+    it("create a new job", function(done) {
         chai.request(app).post("/api/v1/jobs?token=" + token)
             .send(testJob)
             .end(function(err, res) {
