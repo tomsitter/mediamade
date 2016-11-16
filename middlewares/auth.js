@@ -30,11 +30,11 @@ module.exports.verifyToken = function(req, res, next) {
     }
 }
 
-module.exports.generateToken = function(id) {
+module.exports.generateToken = function(id, permissions) {
     var claims = {
         sub: id,
         iss: 'https://mediamade.me',
-        permissions: 'user'
+        permissions: permissions
     };
     var jwt = nJwt.create(claims, nconf.get('auth:secret'));
     jwt.setExpiration(new Date().getTime() + (365*24*60*60*1000));

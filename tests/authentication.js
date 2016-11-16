@@ -15,9 +15,7 @@ chai.use(chaiHttp);
 describe('Local Sign Up', function () {
 
     before(function (done) {
-        User.remove({}, function() {
-            done();
-        });
+        User.remove().exec().then(function() { done(); });
     });
 
     it('should have no users at the start', function(done) {
@@ -30,7 +28,7 @@ describe('Local Sign Up', function () {
 
     it('should create a new user', function(done) {
         chai.request(app).post('/api/v1/signup')
-            .send({'email': 'test@test.com', 'password': 'test', "user_type": "PRODUCER"})
+            .send({'email': 'test@test.com', 'password': 'test', "user_type": "CLIENT"})
             .end(function(err, res) {
                 should.not.exist(err);
                 res.should.have.status(200);
@@ -46,33 +44,6 @@ describe('Local Sign Up', function () {
                 should.exist(err);
                 res.should.have.status(401);
                 res.body.should.not.have.property('token');
-                done();
-        });
-    });
-});
-
-describe('Local Log In', function() {
-    before(function (done) {
-        User.remove({}, function() {
-            done();
-        });
-    });
-
-    it('should have no users at the start', function(done) {
-        User.find({}, function(err, users) {
-            should.not.exist(err);
-            users.should.have.length(0);
-            done();
-        });
-    });
-
-    it('should create a new user', function(done) {
-        chai.request(app).post('/api/v1/signup')
-            .send({'email': 'test@test.com', 'password': 'test', "user_type": "PRODUCER"})
-            .end(function(err, res) {
-                should.not.exist(err);
-                res.should.have.status(200);
-                res.body.should.have.property('token');
                 done();
         });
     });

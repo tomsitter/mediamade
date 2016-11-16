@@ -38,13 +38,12 @@ module.exports = function(passport) {
                     newUser.local.password = newUser.generateHash(password);
                     newUser.user_type = req.body.user_type;
 
-
                     newUser.save(function(err) {
                         if (err) {
                             throw err;
                         }
 
-                        req.token = generateToken(newUser.id);
+                        req.token = generateToken(newUser.id, req.body.user_type);
 
                         return done(null, newUser);
                     });
