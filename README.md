@@ -4,11 +4,56 @@
 
 ## Authentication
 
-### /api/v1/signup
-Creates a new user account and returns an authentication token
+### POST /api/v1/signup
+Creates a new user account and returns an authentication token, logs in a user to an existing account
 
-### /api/v1/login
+__URL params:__ None
+
+__Body:__
+```json
+{
+  "email": "test@gmail.com",
+  "password": "testpassword",
+  "user_type": "CLIENT""
+}
+```
+
+__Success__:  
+
+When creating account
+  - Code: 201
+  - Content:  
+`{ token: "json-web-token" }`
+  
+When logging into account
+  - Code: 200
+  - Content:  
+`{ token: "json-web-token" }`
+
+__Error:__
+
+### POST /api/v1/login
 Accepts user login credentials and returns an authentication token
+
+__URL params:__ None
+
+__Body:__
+```json
+{
+  "email": "test@gmail.com",
+  "password": "testpassword",
+}
+```
+
+__Success__:  
+  - Code: 200
+  - Content:  
+`{ token: "json-web-token" }`
+
+__Error:__
+  - Code: 401
+  - Content:
+  
 
 ## Profiles
 Create, edit, and view user profiles
