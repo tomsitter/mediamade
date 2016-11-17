@@ -28,7 +28,7 @@ module.exports = function(passport) {
                 }
 
                 if (user) {
-                    logger.error('User ' + user + ' already exists!');
+                    logger.error('User ' + user.id + ' already exists!');
                     return done(null, false);
                 } else {
                     var newUser = new User();
