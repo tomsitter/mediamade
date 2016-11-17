@@ -3,7 +3,6 @@ var bcrypt   = require('bcrypt-nodejs');
 var Schema = mongoose.Schema;
 
 var User = new Schema({
-    date_created: {type: Date, default: Date.now},
     last_login: {type: Date, index: true},
     user_type: {type: String, index: true, required: true},
     local: {
@@ -27,8 +26,11 @@ var User = new Schema({
         token: String,
         displayName: String,
         username: String
+    }},
+    {
+        timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
     }
-});
+);
 
 User.methods.generateHash = function(password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);

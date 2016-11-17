@@ -69,7 +69,6 @@ describe("Profile", function() {
                 should.not.exist(err);
                 res.should.have.status(200);
                 res.body._id.should.equal(profileId);
-                console.log(res.body);
                 done();
         });
     });
