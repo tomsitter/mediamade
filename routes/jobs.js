@@ -95,7 +95,7 @@ router.get('/v1/jobs',
     function(req, res) {
         Job.find({"user_id": req.userId}).exec()
             .then(function(jobs) {
-                if (jobs.length == 0) {
+                if (jobs.length === 0) {
                     res.status(401).json({"error": "No jobs found"});
                 } else {
                     res.status(200).json(jobs);
@@ -119,6 +119,10 @@ router.delete('/v1/jobs/:id', function(req, res) {
         .catch(function(err) {
             handleError(res, err.message, "Failed to delete job", 500);
         });
+});
+
+router.post('/v1/jobs/:id/search', function(req, res) {
+   // TODO: Pull apart a job and turn it into a search
 });
 
 module.exports = router;
