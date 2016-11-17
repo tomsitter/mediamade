@@ -4,8 +4,6 @@ var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var winston = require('winston');
 var nconf = require('nconf');
 
-var generateToken = require('../middlewares/auth').generateToken;
-
 var User = require('../models/user');
 
 var logger = new (winston.Logger)({
@@ -43,7 +41,7 @@ module.exports = function(passport) {
                             throw err;
                         }
 
-                        req.token = generateToken(newUser.id, req.body.user_type);
+                        req.token = newUser.generateToken();
 
                         return done(null, newUser);
                     });
@@ -75,8 +73,8 @@ module.exports = function(passport) {
                 return done(null, false);
             }
 
-            var token = generateToken(user.id);
-            req.token = token;
+            req.token = user.generateToken();
+
             return done(null, user);
         });
     }));
