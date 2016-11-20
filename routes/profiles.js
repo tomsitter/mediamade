@@ -2,6 +2,7 @@ var winston = require('winston');
 var router = require('express').Router();
 var auth = require('../middlewares/auth');
 var Profile = require('../models/profile.js');
+var profileController = require('../controllers/profiles.js');
 
 function handleError(res, reason, message, code) {
   console.log("ERROR: " + reason);
@@ -55,36 +56,7 @@ router.route('/v1/profile')
         });
     })
     .put(function(req, res) {
-        Profile.findOne({user_id: req.userId}, function(err, profile) {
-            if (err) {
-                handleError(res, err.message, "Failed to update user profile");
-            } else if (!profile) {
-                res.status(404).json({"error": "No profile found for user"});
-            } else {
-                if (!req.body.name) {
-                    handleError(res, "Invalid profile", "Must provide a name", 400);
-                }
-
-                if (!req.userId) {
-                    handleError(res, "Invalid User ID", "Something wrong with token", 500);
-                }
-
-                profile.name = req.body.name;
-                profile.description = req.body.description || '';
-                var address = req.body.address || '';
-                profile.location = {address: address};
-                profile.services = req.body.services || [];
-                profile.tags = req.body.tags || [];
-                profile.hourly_rate = req.body.hourly_rate || '';
-
-                profile.save(function(err) {
-                    if (err) {
-                        handleError(res, err.message, "Failed to save new profile");
-                    }
-                    res.status(200).json(profile);
-                });
-            }
-        });
+        profileController.update(Profile, req.userId, req.body, res);
     })
     .get(function(req, res) {
         Profile.findOne({user_id: req.userId}, function (err, profile) {

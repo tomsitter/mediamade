@@ -18,30 +18,28 @@ describe("Profile", function() {
     var userId = mainUserId;
 
     before(function (done) {
-        mockery.enable({
-          warnOnReplace: false,
-          warnOnUnregistered: false,
-          useCleanCache: true
+        Profile.remove({}, function() {
+            mockery.enable({
+              warnOnReplace: false,
+              warnOnUnregistered: false,
+              useCleanCache: true
+            });
+            authMock = {
+                verifyToken: function (req, res, next) {
+                    req.userId = userId;
+                    next();
+                }
+            };
+            mockery.registerMock("../middlewares/auth", authMock);
+
+            app = require("../app.js");
+            done();
         });
-        authMock = {
-            verifyToken: function (req, res, next) {
-                req.userId = userId;
-                next();
-            }
-        };
-        mockery.registerMock("../middlewares/auth", authMock);
-
-        app = require("../app.js");
-
-        done();
     });
 
     after(function (done) {
         mockery.disable();
-        Profile.remove({}, function() {
-            done();
-        });
-
+        done();
     });
 
     var token = "test-token";
@@ -49,7 +47,7 @@ describe("Profile", function() {
     var testProfile = {
         name: "Original Name",
         client_type: "CLIENT",
-        location: "123 Fake St",
+        address: "49 Amroth Ave, Toronto, Ontario, Canada",
     };
 
     it("create a new profile", function(done) {
