@@ -51,8 +51,8 @@ app.use('/api', require('./routes/waitlist.js'));
 app.use('/api', require('./routes/users.js')(passport));
 
 // Token required
-app.use('/api', require('./routes/profiles.js'));
 app.use('/api', require('./routes/jobs.js'));
+app.use('/api', require('./routes/profiles.js'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
