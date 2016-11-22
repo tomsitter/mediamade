@@ -14,8 +14,9 @@ describe("Profile", function() {
     var app, authMock;
     var profileId;
     var mainUserId = mongoose.Types.ObjectId();
+    var mainUserToken = "main-user-token";
     var altUserId = mongoose.Types.ObjectId();
-    var userId = mainUserId;
+    var altUserToken = "alt-user-token";
 
     before(function (done) {
         Profile.remove({}, function() {
@@ -26,7 +27,11 @@ describe("Profile", function() {
             });
             authMock = {
                 verifyToken: function (req, res, next) {
-                    req.userId = userId;
+                    if (req.query.token === mainUserToken) {
+                        req.userId = mainUserId;
+                    } else {
+                        req.userId = altUserId;
+                    }
                     next();
                 }
             };
@@ -51,7 +56,7 @@ describe("Profile", function() {
     };
 
     it("create a new profile", function(done) {
-        chai.request(app).post("/api/v1/profile?token=" + token)
+        chai.request(app).post("/api/v1/profile?token=" + mainUserToken)
             .send(testProfile)
             .end(function(err, res) {
                 should.not.exist(err);
@@ -62,19 +67,19 @@ describe("Profile", function() {
     });
 
     it("get own profile", function(done) {
-        chai.request(app).get("/api/v1/profile?token=" + token)
+        chai.request(app).get("/api/v1/profile?token=" + mainUserToken)
             .end(function(err, res) {
                 should.not.exist(err);
                 res.should.have.status(200);
+                console.log("Profile Id" + profileId);
                 res.body._id.should.equal(profileId);
                 done();
         });
     });
 
     it("change the name", function(done) {
-        userId = mainUserId;
         testProfile.name = 'Changed Name';
-        chai.request(app).put("/api/v1/profile?token=rightusertoken")
+        chai.request(app).put("/api/v1/profile?token=" + mainUserToken)
             .send(testProfile)
             .end(function(err, res) {
                 should.not.exist(err);
@@ -85,11 +90,11 @@ describe("Profile", function() {
     });
 
     it("get specified profile", function(done) {
-        userId = altUserId;
-        chai.request(app).get("/api/v1/profile/" + mainUserId + '?token=wronguserid')
+        chai.request(app).get("/api/v1/profile/" + mainUserId + '?token=' + altUserToken)
             .end(function(err, res) {
                 should.not.exist(err);
                 res.should.have.status(200);
+                console.log(res.body);
                 res.body._id.should.equal(profileId);
                 res.body.name.should.equal("Changed Name");
                 done();

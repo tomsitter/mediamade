@@ -14,7 +14,6 @@ function handleError(res, reason, message, code) {
   res.status(code || 500).json({"error": message});
 }
 
-router.use(auth.verifyToken);
 
 var jobProperties = {
     body: Joi.object().keys({
@@ -31,6 +30,7 @@ var jobProperties = {
 };
 
 router.post('/v1/jobs',
+    auth.verifyToken,
     validate(jobProperties),
     function(req, res) {
         if (!req.userId) {
@@ -51,6 +51,7 @@ router.post('/v1/jobs',
 );
 
 router.put('/v1/jobs/:id',
+    auth.verifyToken,
     validate(jobProperties),
     function(req, res) {
         Job.findById(req.params.id).exec()
@@ -76,6 +77,7 @@ router.put('/v1/jobs/:id',
 );
 
 router.get('/v1/jobs/:id',
+    auth.verifyToken,
     function(req, res) {
         Job.findOne({_id: req.params.id, $or:[{status: "public"}, {"user_id": req.userId}]}).exec()
             .then(function(job) {
@@ -92,6 +94,7 @@ router.get('/v1/jobs/:id',
 );
 
 router.get('/v1/jobs',
+    auth.verifyToken,
     function(req, res) {
         Job.find({"user_id": req.userId}).exec()
             .then(function(jobs) {
@@ -107,21 +110,26 @@ router.get('/v1/jobs',
     }
 );
 
-router.delete('/v1/jobs/:id', function(req, res) {
-    Job.findOne({_id: req.params.id, user_id: req.userId}).exec()
-        .then(function(job) {
-            if (!job) {
-                res.status(401).json({"error": "Job not found"});
-            } else {
-                res.status(200).json(job);
-            }
-        })
-        .catch(function(err) {
-            handleError(res, err.message, "Failed to delete job", 500);
-        });
-});
+router.delete('/v1/jobs/:id',
+    auth.verifyToken,
+    function(req, res) {
+        Job.findOne({_id: req.params.id, user_id: req.userId}).exec()
+            .then(function(job) {
+                if (!job) {
+                    res.status(401).json({"error": "Job not found"});
+                } else {
+                    res.status(200).json(job);
+                }
+            })
+            .catch(function(err) {
+                handleError(res, err.message, "Failed to delete job", 500);
+            });
+    }
+);
 
-router.post('/v1/jobs/:id/search', function(req, res) {
+router.post('/v1/jobs/:id/search',
+    auth.verifyToken,
+    function(req, res) {
    // TODO: Pull apart a job and turn it into a search
 });
 
