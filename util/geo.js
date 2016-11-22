@@ -31,7 +31,6 @@ module.exports = {
                 return done({"error": err.message});
             }
             else {
-                console.log('Got coords!');
                 var coords = getLonLat(res[0]);
                 return done(coords);
             }

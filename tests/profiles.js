@@ -71,7 +71,6 @@ describe("Profile", function() {
             .end(function(err, res) {
                 should.not.exist(err);
                 res.should.have.status(200);
-                console.log("Profile Id" + profileId);
                 res.body._id.should.equal(profileId);
                 done();
         });
@@ -94,7 +93,6 @@ describe("Profile", function() {
             .end(function(err, res) {
                 should.not.exist(err);
                 res.should.have.status(200);
-                console.log(res.body);
                 res.body._id.should.equal(profileId);
                 res.body.name.should.equal("Changed Name");
                 done();

@@ -29,10 +29,8 @@ describe("Jobs", function() {
             authMock = {
                 verifyToken: function (req, res, next) {
                     if (req.query.token === mainUserToken) {
-                        console.log("Assigning user Id to main User Id: " + mainUserId);
                         req.userId = mainUserId;
                     } else {
-                        console.log("Assigning user Id to alt User Id: " + altUserId);
                         req.userId = altUserId;
                     }
                     next();
@@ -41,9 +39,6 @@ describe("Jobs", function() {
             mockery.registerMock("../middlewares/auth", authMock);
 
             app = require("../app.js");
-
-            console.log("Main User; " + mainUserId);
-            console.log("Alt User: " + altUserId);
 
             done();
         });
@@ -104,7 +99,6 @@ describe("Jobs", function() {
     it("not find a pending job with the wrong user Id", function(done) {
         chai.request(app).get("/api/v1/jobs/" + jobId + "?token=" + altUserToken)
             .end(function(err, res) {
-                console.log("Found pending job: " + JSON.stringify(res.body));
                 res.should.have.status(401);
                 done();
             });

@@ -11,10 +11,7 @@
 var geo = require('../util/geo.js');
 
 function geocode(model, userId, address, res) {
-    console.log('Geocoding!');
     geo.getCoords(address, function (coords) {
-        console.log('In get coords');
-        console.log('address: ' + address);
         if ('error' in coords) {
             handleError(res, coords.error, "Failed to geocode address", 500);
         }
@@ -67,7 +64,6 @@ exports.update = function(model, userId, reqBody, res) {
 };
 
 exports.create = function(model, userId, reqBody, res) {
-    console.log("In create, userId is " + userId);
 
     if (!reqBody.name) {
         handleError(res, "Invalid profile", "Must provide a name", 400);
@@ -105,8 +101,6 @@ exports.create = function(model, userId, reqBody, res) {
         } else {
             model.create(newProfile)
                 .then(function(createdProfile) {
-                    console.log("Created profile: " + createdProfile);
-                    console.log("User Id is " + userId);
                     res.status(201).json(createdProfile);
                     geocode(model, userId, reqBody.address, res);
                 })
