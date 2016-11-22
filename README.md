@@ -71,7 +71,45 @@ Create, edit, and view user profiles
 Create, edit, and view jobs
 
 ## Wait List
+
+### POST /api/v1/waitlist
 Register for the mediamade waitlist. Accepts email and surveys
+
+__URL params:__ None
+
+__Body:__
+```json
+{
+  //required
+  "email": "test@gmail.com",
+  
+  //optional
+  "survey": {
+    "client_type": "CLIENT",
+    "hiring": "PHOTO",
+    "services": ["SERVICES"],
+    "city": "Thunder Bay",
+    "photo_price": 100, // per 10 photos?
+    "video_price": 150  // per 1 minute video?
+  }
+}
+```
+
+__Success__:  
+
+When adding new email to waitlist
+  - Code: 201
+  - Content:  waitlist document
+  
+When updating/adding survey to existing email
+  - Code: 200
+  - Content:  waitlist document
+
+__Error:__
+
+  -Code:500
+  -Content:
+  `{error: "Failed to add customer to waitlist"}`
 
 
 
