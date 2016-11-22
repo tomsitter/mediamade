@@ -15,37 +15,44 @@ describe("Jobs", function() {
     var app, authMock;
     var jobId;
     var mainUserId = mongoose.Types.ObjectId();
+    var mainUserToken = "main-user-token";
     var altUserId = mongoose.Types.ObjectId();
-    var userId = mainUserId;
+    var altUserToken = "alt-user-token";
 
     before(function (done) {
-        mockery.enable({
-          warnOnReplace: false,
-          warnOnUnregistered: false,
-          useCleanCache: true
+        Job.remove({}, function() {
+            mockery.enable({
+              warnOnReplace: false,
+              warnOnUnregistered: false,
+              useCleanCache: true
+            });
+            authMock = {
+                verifyToken: function (req, res, next) {
+                    if (req.query.token === mainUserToken) {
+                        console.log("Assigning user Id to main User Id: " + mainUserId);
+                        req.userId = mainUserId;
+                    } else {
+                        console.log("Assigning user Id to alt User Id: " + altUserId);
+                        req.userId = altUserId;
+                    }
+                    next();
+                }
+            };
+            mockery.registerMock("../middlewares/auth", authMock);
+
+            app = require("../app.js");
+
+            console.log("Main User; " + mainUserId);
+            console.log("Alt User: " + altUserId);
+
+            done();
         });
-        authMock = {
-            verifyToken: function (req, res, next) {
-                req.userId = userId;
-                next();
-            }
-        };
-        mockery.registerMock("../middlewares/auth", authMock);
-
-        app = require("../app.js");
-
-        done();
     });
 
     after(function (done) {
         mockery.disable();
-        Job.remove({}, function() {
-            done();
-        });
-
+        done();
     });
-
-    var token = "test-token";
 
     var testJob = {
         services: ["PHOTO", "VIDEO"],
@@ -63,7 +70,7 @@ describe("Jobs", function() {
 
 
     it("create a new job", function(done) {
-        chai.request(app).post("/api/v1/jobs?token=" + token)
+        chai.request(app).post("/api/v1/jobs?token=" + mainUserToken)
             .send(testJob)
             .end(function(err, res) {
                 should.not.exist(err);
@@ -74,7 +81,7 @@ describe("Jobs", function() {
     });
 
     it("find the public job", function(done) {
-        chai.request(app).get("/api/v1/jobs/" + jobId + '?token=wronguserid')
+        chai.request(app).get("/api/v1/jobs/" + jobId + '?token=' + altUserToken)
             .end(function(err, res) {
                 should.not.exist(err);
                 res.should.have.status(200);
@@ -84,7 +91,7 @@ describe("Jobs", function() {
 
     it("make the job status pending", function(done) {
         testJob.status = 'pending';
-        chai.request(app).put("/api/v1/jobs/" + jobId + "?token=rightusertoken")
+        chai.request(app).put("/api/v1/jobs/" + jobId + "?token=" + mainUserToken)
             .send(testJob)
             .end(function(err, res) {
                 should.not.exist(err);
@@ -95,18 +102,16 @@ describe("Jobs", function() {
     });
 
     it("not find a pending job with the wrong user Id", function(done) {
-        // replace the user Id with a different one
-        userId = altUserId;
-        chai.request(app).get("/api/v1/jobs/" + jobId + "?token=wrongusertoken")
+        chai.request(app).get("/api/v1/jobs/" + jobId + "?token=" + altUserToken)
             .end(function(err, res) {
+                console.log("Found pending job: " + JSON.stringify(res.body));
                 res.should.have.status(401);
                 done();
             });
     });
 
     it("finds all jobs for main user", function(done) {
-       userId = mainUserId;
-        chai.request(app).get("/api/v1/jobs?token=mainusertoken")
+        chai.request(app).get("/api/v1/jobs?token=" + mainUserToken)
             .end(function(err, res) {
                 res.should.have.status(200);
                 done();
@@ -114,8 +119,7 @@ describe("Jobs", function() {
     });
 
     it("finds NO jobs for alt user", function(done) {
-       userId = altUserId;
-        chai.request(app).get("/api/v1/jobs?token=altusertoken")
+        chai.request(app).get("/api/v1/jobs?token=" + altUserToken)
             .end(function(err, res) {
                 res.should.have.status(401);
                 done();
@@ -123,8 +127,7 @@ describe("Jobs", function() {
     });
 
     it("deletes NO jobs for alt user", function(done) {
-        userId = altUserId;
-        chai.request(app).delete("/api/v1/jobs/" + jobId + "?token=altusertoken")
+        chai.request(app).delete("/api/v1/jobs/" + jobId + "?token=" + altUserToken)
             .end(function(err, res) {
                 res.should.have.status(401);
                 done();
@@ -132,8 +135,7 @@ describe("Jobs", function() {
     });
 
     it("deletes the job for main user", function(done) {
-        userId = mainUserId;
-        chai.request(app).delete("/api/v1/jobs/" + jobId + "?token=mainusertoken")
+        chai.request(app).delete("/api/v1/jobs/" + jobId + "?token=" + mainUserToken)
             .end(function(err, res) {
                 res.should.have.status(200);
                 res.body._id.should.equal(jobId);
