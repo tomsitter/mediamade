@@ -11,8 +11,8 @@ describe("Geo", function() {
 
     it('should geocode an address', function(done) {
        geo.getCoords('49 Amroth Ave, Toronto, ON, Canada', function(coords) {
-           coords[0].should.equal(-79.3110907314286);
-           coords[1].should.equal(43.6848620942857);
+           coords[0].should.be.closeTo(-79.3, 0.1);
+           coords[1].should.be.closeTo(43.7, 0.1);
            done();
        });
     });
