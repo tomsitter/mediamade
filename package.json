@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
+    "bluebird": "3.x",
     "body-parser": "~1.15.1",
     "celebrate": "^3.0.0",
     "cookie-parser": "~1.4.3",
